@@ -19,9 +19,8 @@ Route::get('/produits', [ProduitController::class, 'index']);
 Route::get('/produits/{id}', [ProduitController::class, 'show']);
 
 // ===== NOUVELLES ROUTES PUBLIQUES POUR PRODUITS =====
-Route::get('/produits/latest/public', [ProduitController::class, 'latest']);
-Route::get('/produits/paginate/public', [ProduitController::class, 'paginate']);
-
+Route::get('/produits/search/paginate', [ProduitController::class, 'paginate']);
+Route::get('/produits/search/latest', [ProduitController::class, 'latest']);
 /*
 |--------------------------------------------------------------------------
 | API Routes avec préfixe v1

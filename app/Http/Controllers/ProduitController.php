@@ -658,53 +658,100 @@ class ProduitController extends Controller
     /**
      * Pagination et recherche
      */
-    public function paginate(Request $request)
-    {
-        try {
-            $search = $request->query('search');
-            $categoryId = $request->query('categorie_id');
-            $perPage = $request->query('per_page', 15);
+    /**
+ * Pagination et recherche avancée
+ */
+public function paginate(Request $request)
+{
+    try {
+        // Récupérer les paramètres
+        $search = $request->query('search');
+        $categoryId = $request->query('categorie_id');
+        $uniteId = $request->query('unite_id');
+        $prixMin = $request->query('prix_min');
+        $prixMax = $request->query('prix_max');
+        $perPage = $request->query('per_page', 15);
+        $orderBy = $request->query('order_by', 'created_at');
+        $orderDir = $request->query('order_dir', 'desc');
 
-            $query = Produit::query();
+        // Construire la requête
+        $query = Produit::query();
 
-            if ($categoryId) {
-                $query->where('categorie_id', $categoryId);
-            }
-
-            if ($search) {
-                $query->where(function($q) use ($search) {
-                    $q->where('nom', 'like', "%{$search}%")
-                      ->orWhere('description', 'like', "%{$search}%");
-                });
-            }
-
-            $produits = $query->orderBy('created_at', 'desc')->paginate($perPage);
-            
-            foreach ($produits as $produit) {
-                $produit->photos = Photoproduit::where('produit_id', $produit->id)->get();
-            }
-
-            return response()->json([
-                'status_message' => 'Produits récupérés',
-                'status_code' => 200,
-                'data' => [
-                    'items' => $produits->items(),
-                    'total' => $produits->total(),
-                    'per_page' => $produits->perPage(),
-                    'current_page' => $produits->currentPage(),
-                    'last_page' => $produits->lastPage()
-                ]
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'status_message' => $e->getMessage(),
-                'status_code' => 500,
-                'data' => null
-            ], 500);
+        // Filtrer par catégorie
+        if ($categoryId) {
+            $query->where('categorie_id', $categoryId);
         }
-    }
 
+        // Filtrer par unité
+        if ($uniteId) {
+            $query->where('unite_id', $uniteId);
+        }
+
+        // Filtrer par prix min
+        if ($prixMin !== null) {
+            $query->where('prix', '>=', (int)$prixMin);
+        }
+
+        // Filtrer par prix max
+        if ($prixMax !== null) {
+            $query->where('prix', '<=', (int)$prixMax);
+        }
+
+        // Recherche par mot-clé
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('nom', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // Tri
+        $allowedOrderFields = ['id', 'nom', 'prix', 'created_at', 'updated_at'];
+        if (in_array($orderBy, $allowedOrderFields)) {
+            $query->orderBy($orderBy, $orderDir === 'asc' ? 'asc' : 'desc');
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        // Pagination
+        $produits = $query->paginate($perPage);
+        
+        // Ajouter les photos
+        foreach ($produits as $produit) {
+            $produit->photos = Photoproduit::where('produit_id', $produit->id)->get();
+        }
+
+        // Retourner la réponse
+        return response()->json([
+            'status_message' => 'Produits récupérés avec succès',
+            'status_code' => 200,
+            'data' => [
+                'items' => $produits->items(),
+                'total' => $produits->total(),
+                'per_page' => $produits->perPage(),
+                'current_page' => $produits->currentPage(),
+                'last_page' => $produits->lastPage(),
+                'filters_applied' => [
+                    'search' => $search,
+                    'categorie_id' => $categoryId,
+                    'unite_id' => $uniteId,
+                    'prix_min' => $prixMin,
+                    'prix_max' => $prixMax,
+                    'order_by' => $orderBy,
+                    'order_dir' => $orderDir
+                ]
+            ]
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status_message' => 'Erreur lors de la récupération des produits',
+            'status_code' => 500,
+            'error' => $e->getMessage(),
+            'data' => null
+        ], 500);
+    }
+}
     /**
      * ========== MÉTHODES PRIVÉES ==========
      */

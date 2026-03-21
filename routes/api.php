@@ -83,6 +83,18 @@ Route::prefix('v1')->group(function () {
             Route::delete('/produits/{id}/photos', [ProduitController::class, 'deleteAllPhotos']);   // Supprimer toutes les photos
             Route::put('/produits/{id}/photos', [ProduitController::class, 'updatePhotos']);         // Remplacer toutes les photos
             Route::put('/produits/{produitId}/photos/{photoId}/main', [ProduitController::class, 'setMainPhoto']); // Définir photo principale']);
+
+            // Routes pour les fournisseurs
+Route::prefix('fournisseurs')->group(function () {
+    Route::get('/', [FournisseurController::class, 'index']);
+    Route::get('/search', [FournisseurController::class, 'search']);
+    Route::get('/latest', [FournisseurController::class, 'latest']);
+    Route::get('/statistics', [FournisseurController::class, 'statistics']);
+    Route::get('/{id}', [FournisseurController::class, 'show']);
+    Route::post('/', [FournisseurController::class, 'store']);
+    Route::put('/{id}', [FournisseurController::class, 'update']);
+    Route::delete('/{id}', [FournisseurController::class, 'destroy']);
+});
                         
         });
     });

@@ -85,17 +85,30 @@ Route::prefix('v1')->group(function () {
             Route::put('/produits/{produitId}/photos/{photoId}/main', [ProduitController::class, 'setMainPhoto']); // Définir photo principale']);
 
             // Routes pour les fournisseurs
-Route::prefix('fournisseurs')->group(function () {
-    Route::get('/', [FournisseurController::class, 'index']);
-    Route::get('/search', [FournisseurController::class, 'search']);
-    Route::get('/latest', [FournisseurController::class, 'latest']);
-    Route::get('/statistics', [FournisseurController::class, 'statistics']);
-    Route::get('/{id}', [FournisseurController::class, 'show']);
-    Route::post('/', [FournisseurController::class, 'store']);
-    Route::put('/{id}', [FournisseurController::class, 'update']);
-    Route::delete('/{id}', [FournisseurController::class, 'destroy']);
-});
-                        
+        Route::prefix('fournisseurs')->group(function () {
+            Route::get('/', [FournisseurController::class, 'index']);
+            Route::get('/search', [FournisseurController::class, 'search']);
+            Route::get('/latest', [FournisseurController::class, 'latest']);
+            Route::get('/statistics', [FournisseurController::class, 'statistics']);
+            Route::get('/{id}', [FournisseurController::class, 'show']);
+            Route::post('/', [FournisseurController::class, 'store']);
+            Route::put('/{id}', [FournisseurController::class, 'update']);
+            Route::delete('/{id}', [FournisseurController::class, 'destroy']);
+        });
+
+
+        // Routes pour les approvisionnements
+        Route::prefix('approvisionnements')->group(function () {
+            Route::get('/', [ApprovisionnementController::class, 'index']);
+            Route::get('/search', [ApprovisionnementController::class, 'search']);
+            Route::get('/latest', [ApprovisionnementController::class, 'latest']);
+            Route::get('/statistics', [ApprovisionnementController::class, 'statistics']);
+            Route::get('/{id}', [ApprovisionnementController::class, 'show']);
+            Route::post('/', [ApprovisionnementController::class, 'store']);
+            Route::put('/{id}', [ApprovisionnementController::class, 'update']);
+            Route::delete('/{id}', [ApprovisionnementController::class, 'destroy']);
+        });
+                                
         });
     });
 });
